@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Swarming Technology, LLC. All rights reserved.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="wishlist_product_add_after">
+        <observer name="buzzi_publish_wishlist_item" instance="Buzzi\PublishWishlistItem\Observer\WishlistAddAfter" />
+    </event>
+</config>
