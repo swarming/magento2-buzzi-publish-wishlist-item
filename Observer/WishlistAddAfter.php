@@ -4,6 +4,7 @@
  */
 namespace Buzzi\PublishWishlistItem\Observer;
 
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Event\Observer;
 use Buzzi\PublishWishlistItem\Model\DataBuilder;
 
@@ -12,31 +13,39 @@ class WishlistAddAfter implements \Magento\Framework\Event\ObserverInterface
     /**
      * @var \Buzzi\Publish\Model\Config\Events
      */
-    protected $configEvents;
+    private $configEvents;
 
     /**
      * @var \Buzzi\Publish\Api\QueueInterface
      */
-    protected $queue;
+    private $queue;
 
     /**
      * @var \Buzzi\PublishWishlistItem\Model\DataBuilder
      */
-    protected $dataBuilder;
+    private $dataBuilder;
+
+    /**
+     * @var \Buzzi\Publish\Helper\Customer
+     */
+    private $customerHelper;
 
     /**
      * @param \Buzzi\Publish\Model\Config\Events $configEvents
      * @param \Buzzi\Publish\Api\QueueInterface $queue
      * @param \Buzzi\PublishWishlistItem\Model\DataBuilder $dataBuilder
+     * @param \Buzzi\Publish\Helper\Customer|null $customerHelper
      */
     public function __construct(
         \Buzzi\Publish\Model\Config\Events $configEvents,
         \Buzzi\Publish\Api\QueueInterface $queue,
-        \Buzzi\PublishWishlistItem\Model\DataBuilder $dataBuilder
+        \Buzzi\PublishWishlistItem\Model\DataBuilder $dataBuilder,
+        \Buzzi\Publish\Helper\Customer $customerHelper = null
     ) {
         $this->configEvents = $configEvents;
         $this->queue = $queue;
         $this->dataBuilder = $dataBuilder;
+        $this->customerHelper = $customerHelper ?: ObjectManager::getInstance()->get(\Buzzi\Publish\Helper\Customer::class);
     }
 
     /**
@@ -58,7 +67,9 @@ class WishlistAddAfter implements \Magento\Framework\Event\ObserverInterface
         $wishlist = $wishlistItems[0]->getWishlist();
         $storeId = $wishlist->getStore()->getId();
 
-        if (!$this->configEvents->isEventEnabled(DataBuilder::EVENT_TYPE, $storeId)) {
+        if (!$this->configEvents->isEventEnabled(DataBuilder::EVENT_TYPE, $storeId)
+            || !$this->customerHelper->isCurrentExceptsMarketing()
+        ) {
             return;
         }
 
