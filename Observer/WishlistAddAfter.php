@@ -26,26 +26,26 @@ class WishlistAddAfter implements \Magento\Framework\Event\ObserverInterface
     private $dataBuilder;
 
     /**
-     * @var \Buzzi\Publish\Helper\Customer
+     * @var \Buzzi\Publish\Helper\ExceptsMarketing
      */
-    private $customerHelper;
+    private $exceptsMarketingHelper;
 
     /**
      * @param \Buzzi\Publish\Model\Config\Events $configEvents
      * @param \Buzzi\Publish\Api\QueueInterface $queue
      * @param \Buzzi\PublishWishlistItem\Model\DataBuilder $dataBuilder
-     * @param \Buzzi\Publish\Helper\Customer|null $customerHelper
+     * @param \Buzzi\Publish\Helper\ExceptsMarketing|null $exceptsMarketingHelper
      */
     public function __construct(
         \Buzzi\Publish\Model\Config\Events $configEvents,
         \Buzzi\Publish\Api\QueueInterface $queue,
         \Buzzi\PublishWishlistItem\Model\DataBuilder $dataBuilder,
-        \Buzzi\Publish\Helper\Customer $customerHelper = null
+        \Buzzi\Publish\Helper\ExceptsMarketing $exceptsMarketingHelper = null
     ) {
         $this->configEvents = $configEvents;
         $this->queue = $queue;
         $this->dataBuilder = $dataBuilder;
-        $this->customerHelper = $customerHelper ?: ObjectManager::getInstance()->get(\Buzzi\Publish\Helper\Customer::class);
+        $this->exceptsMarketingHelper = $exceptsMarketingHelper ?: ObjectManager::getInstance()->get(\Buzzi\Publish\Helper\ExceptsMarketing::class);
     }
 
     /**
@@ -68,7 +68,7 @@ class WishlistAddAfter implements \Magento\Framework\Event\ObserverInterface
         $storeId = $wishlist->getStore()->getId();
 
         if (!$this->configEvents->isEventEnabled(DataBuilder::EVENT_TYPE, $storeId)
-            || !$this->customerHelper->isCurrentExceptsMarketing()
+            || !$this->exceptsMarketingHelper->isExcepts(DataBuilder::EVENT_TYPE, $storeId)
         ) {
             return;
         }
